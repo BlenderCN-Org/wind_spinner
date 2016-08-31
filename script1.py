@@ -169,6 +169,7 @@ def add_female_linkage():
 
 def append_obj(blend_file_name, obj_name):
     file = bpy.path.abspath('//')+blend_file_name
+    print("**********file:"+file+"\n")
     section = '/Object/'
     filepath = file + section + obj_name
     directory = file + section

@@ -99,7 +99,6 @@ def register():
     bpy.utils.register_class(AddWindSpinner)
     bpy.utils.register_class(WindSpinnerMakerPanel)
     bpy.types.INFO_MT_mesh_add.append(add_object_button)
-    bpy.utils.register_class(AddWindSpinnerExecute)
 
     # Properties
     bpy.types.Scene.controller_radius = FloatProperty(
@@ -126,7 +125,6 @@ def unregister():
     bpy.utils.unregister_class(AddWindSpinner)
     bpy.utils.unregister_class(WindSpinnerMakerPanel)
     bpy.types.INFO_MT_mesh_add.remove(add_object_button)
-    bpy.utils.unregister_class(AddWindSpinnerExecute)
     del bpy.types.Scene.controller_radius
     del bpy.types.Scene.rim_radius
     del bpy.types.Scene.rim_minor_radius
