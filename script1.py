@@ -1,4 +1,5 @@
 import sys
+import os
 import bpy
 from mathutils import Vector, Matrix
 import math
@@ -168,8 +169,10 @@ def add_female_linkage():
     return linkage
 
 def append_obj(blend_file_name, obj_name):
-    file = bpy.path.abspath('//')+blend_file_name
-    print("**********file:"+file+"\n")
+
+    import wind_spinner
+    wind_spinner_file = wind_spinner.__file__
+    file = os.path.dirname(wind_spinner.__file__)+"/"+blend_file_name
     section = '/Object/'
     filepath = file + section + obj_name
     directory = file + section
@@ -185,7 +188,14 @@ def delete_all():
     bpy.ops.object.delete(use_global=False)
 
 def test2():
-    pass
+    blend_file_name = 'vane2.blend'
+    import wind_spinner
+    wind_spinner_file = wind_spinner.__file__
+    print("**************wind_spinner_file:" +wind_spinner_file)
+    file = os.path.dirname(wind_spinner.__file__)+"/"+blend_file_name
+
+    #file = bpy.path.abspath('//')+blend_file_name
+    print("**********file:"+file+"\n")
     
 def test():
     hub = add_hub()
