@@ -169,7 +169,6 @@ def add_female_linkage():
     return linkage
 
 def append_obj(blend_file_name, obj_name):
-
     import wind_spinner
     wind_spinner_file = wind_spinner.__file__
     file = os.path.dirname(wind_spinner.__file__)+"/"+blend_file_name
@@ -188,15 +187,8 @@ def delete_all():
     bpy.ops.object.delete(use_global=False)
 
 def test2():
-    blend_file_name = 'vane2.blend'
-    import wind_spinner
-    wind_spinner_file = wind_spinner.__file__
-    print("**************wind_spinner_file:" +wind_spinner_file)
-    file = os.path.dirname(wind_spinner.__file__)+"/"+blend_file_name
-
-    #file = bpy.path.abspath('//')+blend_file_name
-    print("**********file:"+file+"\n")
-    
+    pass
+        
 def test():
     hub = add_hub()
     spoke_num = 0

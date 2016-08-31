@@ -16,7 +16,7 @@ bl_info = {
 
 import bpy
 from bpy.types import Operator
-from bpy.props import FloatVectorProperty, FloatProperty, BoolProperty
+from bpy.props import FloatVectorProperty, FloatProperty, BoolProperty, StringProperty
 from bpy_extras.object_utils import AddObjectHelper, object_data_add
 from mathutils import Vector
 from . import script1
@@ -37,6 +37,9 @@ class WindSpinnerMakerPanel(bpy.types.Panel):
         row.prop(context.scene, 'rim_radius')
         row = layout.row()
         row.prop(context.scene, 'rim_minor_radius')
+        row = layout.row()
+        row.prop_search(context.scene, 'vane_1', context.scene, "objects")
+
         TheCol = self.layout.column(align=True)
         TheCol.operator("mesh.add_wind_spinner", text="Add Wind Spinner")
 
@@ -119,6 +122,9 @@ def register():
         subtype="DISTANCE",
         unit='LENGTH',
         description='Radius of the rim ring')
+    bpy.types.Scene.vane_1 = StringProperty(
+        name='vane 1'
+        )
 
 
 def unregister():
