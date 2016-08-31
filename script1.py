@@ -8,17 +8,17 @@ import imp
 
 Testing = False
 
-Controller_Radius = 0.10
+#Controller_Radius = bpy.context.scene.controller_radius
 
 Rim_Center = (0, 0, 0)
-Rim_Radius = 0.25
-Rim_Minor_Radius = 0.005
+#Rim_Radius = bpy.context.scene.rim_radius
+#Rim_Minor_Radius = 0.005
 
 
 Hub_Center = (0, 0, 0) #TODO: Probably don't need this
-Hub_Thickness = 0.0015
+#Hub_Thickness = 0.0015
 
-Spinner_Hub_Radius = 0.04
+#Spinner_Hub_Radius = 0.04
 Spinner_Radius = Rim_Radius
 Spinner_Number = 12
 Spinner_Start_Angle = math.radians(0)
@@ -31,23 +31,22 @@ Spoke_Start_Angle = math.radians(0)
 Linkage_Male_Len = 0.12
 Linkage_Female_Len = 0.12
 Linkage_Incidence = math.radians(60)
-Linkage_Offset = Spinner_Hub_Radius / 2
+Linkage_Offset = bpy.context.scene.spinner_hub_radius / 2
 
 def add_controller():
-    bpy.ops.mesh.primitive_circle_add(radius=Controller_Radius, fill_type='NGON', location=(Rim_Radius+Controller_Radius+0.10, 0, 0))
+    print("*** controller_radius: "+str(bpy.context.scene.controller_radius))
+    bpy.ops.mesh.primitive_circle_add(radius=bpy.context.scene.controller_radius, fill_type='NGON', location=(bpy.context.scene.rim_radius+bpy.context.scene.controller_radius+0.10, 0, 0))
     controller = bpy.context.object
-    controller.location = (1, 0, 0)
+    controller.location = (1, 0, 0) #TODO: ???
     return controller
 
 def add_rim():
-    bpy.ops.mesh.primitive_torus_add(mode='MAJOR_MINOR', major_radius=Rim_Radius, minor_radius=Rim_Minor_Radius, view_align=False, location=Rim_Center, rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
+    bpy.ops.mesh.primitive_torus_add(mode='MAJOR_MINOR', major_radius=bpy.context.scene.rim_radius, minor_radius=bpy.context.scene.rim_minor_radius, view_align=False, location=Rim_Center, rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
     rim = bpy.context.object
     rim.name = 'rim'
     bpy.ops.object.editmode_toggle()
-    bpy.ops.transform.shrink_fatten(value=0.007)
+    bpy.ops.transform.shrink_fatten(value=0.007) #TODO: ??? hack since minor radius in torus_add is limited
     bpy.ops.object.editmode_toggle()
-    
-    # Add spinners
     return rim
 
 def add_spinners(rim):
@@ -79,7 +78,7 @@ def add_spinner_to_rim(rim, angle, spinner_type = 0):
     hub_empty.name = 'hub_empty'
     hub_empty.empty_draw_size = 0.02
     spinner['hub_empty'] = hub_empty
-    trans_to_rim = Matrix.Translation(Vector((Rim_Radius, 0, 0)))
+    trans_to_rim = Matrix.Translation(Vector((bpy.context.scene.rim_radius, 0, 0)))
     rot_on_rim = Matrix.Rotation(angle, 4, 'Z')
     rot_perp_to_rim = Matrix.Rotation(pi/2, 4, 'X')
     m = rot_on_rim * trans_to_rim * rot_perp_to_rim 
@@ -100,7 +99,7 @@ def add_spinner(spinner_type):
     return result
 
 def add_hub():
-    bpy.ops.mesh.primitive_cylinder_add(vertices=36, radius=Spinner_Hub_Radius, depth=Hub_Thickness  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=Hub_Center, layers=bpy.context.scene.layers)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=36, radius=bpy.context.scene.spinner_hub_radius, depth=bpy.context.scene.hub_thickness  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=Hub_Center, layers=bpy.context.scene.layers)
     hub = bpy.context.object
     hub.name = 'hub'
     return hub

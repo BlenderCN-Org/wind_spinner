@@ -38,6 +38,10 @@ class WindSpinnerMakerPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(context.scene, 'rim_minor_radius')
         row = layout.row()
+        row.prop(context.scene, 'hub_thickness')
+        row = layout.row()
+        row.prop(context.scene, 'spinner_hub_radius')
+        row = layout.row()
         row.prop_search(context.scene, 'vane_1', context.scene, "objects")
 
         TheCol = self.layout.column(align=True)
@@ -122,6 +126,18 @@ def register():
         subtype="DISTANCE",
         unit='LENGTH',
         description='Radius of the rim ring')
+    bpy.types.Scene.hub_thickness = FloatProperty(
+        name='hub thickness',
+        default=0.0015,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='Spinner hub thickness')
+    bpy.types.Scene.spinner_hub_radius = FloatProperty(
+        name='spinner hub radius',
+        default=bpy.types.Scene.rim_radius,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='Radius of a spinner hub')
     bpy.types.Scene.vane_1 = StringProperty(
         name='vane 1'
         )
@@ -134,6 +150,7 @@ def unregister():
     del bpy.types.Scene.controller_radius
     del bpy.types.Scene.rim_radius
     del bpy.types.Scene.rim_minor_radius
+    #TODO: Complete
 
 if __name__ == "__main__":  
     register()  
