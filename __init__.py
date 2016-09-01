@@ -15,11 +15,11 @@ bl_info = {
     }
 
 import bpy
+import math
 from bpy.types import Operator
-from bpy.props import FloatVectorProperty, FloatProperty, BoolProperty, StringProperty
+from bpy.props import FloatVectorProperty, FloatProperty, BoolProperty, StringProperty, IntProperty
 from bpy_extras.object_utils import AddObjectHelper, object_data_add
 from mathutils import Vector
-from . import script1
 
 class WindSpinnerMakerPanel(bpy.types.Panel):
     bl_space_type = "VIEW_3D"
@@ -40,7 +40,29 @@ class WindSpinnerMakerPanel(bpy.types.Panel):
         row = layout.row()
         row.prop(context.scene, 'hub_thickness')
         row = layout.row()
+        row.prop(context.scene, 'spinner_radius')
+        row = layout.row()
         row.prop(context.scene, 'spinner_hub_radius')
+        row = layout.row()
+        row.prop(context.scene, 'spinner_start_angle')
+        row = layout.row()
+        row.prop(context.scene, 'spinner_number')
+        row = layout.row()
+        row.prop(context.scene, 'spoke_offset')
+        row = layout.row()
+        row.prop(context.scene, 'spoke_len')
+        row = layout.row()
+        row.prop(context.scene, 'spoke_number')
+        row = layout.row()
+        row.prop(context.scene, 'spoke_start_angle')
+        row = layout.row()
+        row.prop(context.scene, 'linkage_male_len')
+        row = layout.row()
+        row.prop(context.scene, 'linkage_female_len')
+        row = layout.row()
+        row.prop(context.scene, 'linkage_incidence')
+        row = layout.row()
+        row.prop(context.scene, 'linkage_offset')
         row = layout.row()
         row.prop_search(context.scene, 'vane_1', context.scene, "objects")
 
@@ -48,6 +70,8 @@ class WindSpinnerMakerPanel(bpy.types.Panel):
         TheCol.operator("mesh.add_wind_spinner", text="Add Wind Spinner")
 
 def add_object(self, context):
+    from . import script1
+
     rim = script1.add_rim()
     spinners = script1.add_spinners(rim)
     return
@@ -132,16 +156,78 @@ def register():
         subtype="DISTANCE",
         unit='LENGTH',
         description='Spinner hub thickness')
+    bpy.types.Scene.spinner_radius = FloatProperty(
+        name='spinner radius',
+        default=0.25,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='Radius of a spinner')
     bpy.types.Scene.spinner_hub_radius = FloatProperty(
         name='spinner hub radius',
-        default=bpy.types.Scene.rim_radius,
+        default=0.04,
         subtype="DISTANCE",
         unit='LENGTH',
         description='Radius of a spinner hub')
+    bpy.types.Scene.spinner_number = IntProperty(
+        name='spinner number',
+        default=12,
+        description='Number of spinners')
+    bpy.types.Scene.spinner_start_angle = FloatProperty(
+        name='spinner start angle',
+        default=0.0,
+        subtype="ANGLE",
+        unit='ROTATION',
+        description='starting angle for first spinner')
+    #TODO: Need spoke_offset?
+    bpy.types.Scene.spoke_offset = FloatProperty(
+        name='spoke offset',
+        default=0.04,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='spoke offset from hub center')
+    bpy.types.Scene.spoke_len = FloatProperty(
+        name='spoke length',
+        default=0.23,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='length of a spoke')
+    bpy.types.Scene.spoke_number = IntProperty(
+        name='spoke number',
+        default=2,
+        description='Number of spokes per spinner')
+    bpy.types.Scene.spoke_start_angle = FloatProperty(
+        name='spoke start angle',
+        default=0.0,
+        subtype="ANGLE",
+        unit='ROTATION',
+        description='starting angle for first spoke on spinner')
+    bpy.types.Scene.linkage_male_len = FloatProperty(
+        name='male linkage length',
+        default=0.12,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='length of male linkage')
+    bpy.types.Scene.linkage_female_len = FloatProperty(
+        name='female linkage length',
+        default=0.12,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='length of female linkage')
+    bpy.types.Scene.linkage_incidence = FloatProperty(
+        name='linkage_incidence',
+        default=math.pi/3,
+        subtype="ANGLE",
+        unit='ROTATION',
+        description='hub incidence angle for linkage')
+    bpy.types.Scene.linkage_offset = FloatProperty(
+        name='linkage offset',
+        default=0.02,
+        subtype="DISTANCE",
+        unit='LENGTH',
+        description='linkage offset from hub center')
     bpy.types.Scene.vane_1 = StringProperty(
         name='vane 1'
         )
-
 
 def unregister():
     bpy.utils.unregister_class(AddWindSpinner)

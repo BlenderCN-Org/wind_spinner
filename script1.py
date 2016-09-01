@@ -19,24 +19,26 @@ Hub_Center = (0, 0, 0) #TODO: Probably don't need this
 #Hub_Thickness = 0.0015
 
 #Spinner_Hub_Radius = 0.04
-Spinner_Radius = Rim_Radius
-Spinner_Number = 12
-Spinner_Start_Angle = math.radians(0)
+#Spinner_Radius = Rim_Radius
+Spinner_Radius = 0.25
+#Spinner_Number = 12
+#Spinner_Start_Angle = math.radians(0)
 
-Spoke_Offset = 0.02
-Spoke_Len = Spinner_Radius - Spoke_Offset
-Spoke_Number = 2
-Spoke_Start_Angle = math.radians(0)
+#TODO: Need spoke_offset?
+#Spoke_Offset = 0.02
+#Spoke_Len = Spinner_Radius - Spoke_Offset
+#Spoke_Number = 2
+#Spoke_Start_Angle = math.radians(0)
 
-Linkage_Male_Len = 0.12
-Linkage_Female_Len = 0.12
-Linkage_Incidence = math.radians(60)
-Linkage_Offset = bpy.context.scene.spinner_hub_radius / 2
+#Linkage_Male_Len = 0.12
+#Linkage_Female_Len = 0.12
+#Linkage_Incidence = math.radians(60)
+#Linkage_Offset = bpy.context.scene.spinner_hub_radius / 2
 
 def add_controller():
-    print("*** controller_radius: "+str(bpy.context.scene.controller_radius))
     bpy.ops.mesh.primitive_circle_add(radius=bpy.context.scene.controller_radius, fill_type='NGON', location=(bpy.context.scene.rim_radius+bpy.context.scene.controller_radius+0.10, 0, 0))
     controller = bpy.context.object
+    controller.name = 'controller'
     controller.location = (1, 0, 0) #TODO: ???
     return controller
 
@@ -53,8 +55,8 @@ def add_spinners(rim):
     spinners = []
     controller = add_controller()
     prev_hub = controller
-    for spinner_num in range(Spinner_Number):
-        angle = spinner_num * math.radians(360)/Spinner_Number + Spinner_Start_Angle
+    for spinner_num in range(bpy.context.scene.spinner_number):
+        angle = spinner_num * 2 * math.pi/bpy.context.scene.spinner_number + bpy.context.scene.spinner_start_angle
         spinner = add_spinner_to_rim(rim, angle, spinner_num % 2)
         spinners.append(spinner)
         hub = spinner['hub']
@@ -107,20 +109,27 @@ def add_hub():
 def add_spokes(hub, spinner_type):
     spokes = []
     if spinner_type == 0:
-        for spoke_num in range(Spoke_Number):
-            spoke = add_spoke(hub, spoke_num * 2 * pi / Spoke_Number + Spoke_Start_Angle)
-            vane = append_obj('vane2.blend', 'Big Vane')
+        for spoke_num in range(bpy.context.scene.spoke_number):
+            spoke = add_spoke(hub, spoke_num * 2 * pi / bpy.context.scene.spoke_number + bpy.context.scene.spoke_start_angle)
+            vane_src = bpy.context.scene.objects[bpy.context.scene.vane_1]
+            me = vane_src.data
+            #me_copy = me.copy()
+            #vane = bpy.data.objects.new(bpy.context.scene.vane_1, me_copy)
+            vane = bpy.data.objects.new(bpy.context.scene.vane_1, me)
+            vane.location = (0,0,0)
+            bpy.context.scene.objects.link(vane)
+            #vane = append_obj('vane2.blend', 'Big Vane')
             rot_perp = Matrix.Rotation(-pi/2, 4, 'Y')
             rot_perp2 = Matrix.Rotation(pi/2, 4, 'X')
-            trans = Matrix.Translation(Vector((0, 0, Spoke_Len/2)))
+            trans = Matrix.Translation(Vector((0, 0, bpy.context.scene.spoke_len/2)))
             m = trans * rot_perp * rot_perp2
             vane.rotation_euler = m.to_euler()
             vane.location = m.to_translation()
             vane.parent = spoke
             spokes.append(spoke)
     elif spinner_type ==1:
-        for spoke_num in range(Spoke_Number):
-            spoke = add_spoke(hub, spoke_num * 2 * pi / Spoke_Number + Spoke_Start_Angle+pi/2)
+        for spoke_num in range(bpy.context.scene.spoke_number):
+            spoke = add_spoke(hub, spoke_num * 2 * pi / bpy.context.scene.spoke_number + bpy.context.scene.spoke_start_angle+pi/2)
             vane = append_obj('vane2.blend', 'Large Disk')
             vane.scale = vane.scale * 0.5
             rot_perp = Matrix.Rotation(-pi/2, 4, 'Y')
@@ -134,12 +143,12 @@ def add_spokes(hub, spinner_type):
         return spokes
 
 def add_spoke(hub, angle = 0):
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.0015, depth=Spoke_Len  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=(0, 0, 0), rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.0015, depth=bpy.context.scene.spoke_len  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=(0, 0, 0), rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
     spoke = bpy.context.object
     spoke.name = 'spoke'
     spoke.parent = hub
     bpy.context.scene.cursor_location = Vector((0,0,0))
-    trans = Matrix.Translation(Vector((Spoke_Offset + Spoke_Len/2, 0, 0)))
+    trans = Matrix.Translation(Vector((Spoke_Offset + bpy.context.scene.spoke_len/2, 0, 0)))
     rot = Matrix.Rotation(angle, 4, 'Z')
     rot_perp = Matrix.Rotation(pi/2, 4, 'Y')
     m = rot * trans * rot_perp 
@@ -148,23 +157,23 @@ def add_spoke(hub, angle = 0):
     return spoke
 
 def add_male_linkage():
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.0015, depth=Linkage_Male_Len  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=(0, 0, Linkage_Male_Len/2), rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.0015, depth=bpy.context.scene.linkage_male_len  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=(0, 0, bpy.context.scene.linkage_male_len/2), rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
     linkage = bpy.context.object
     linkage.name = 'male linkage'
     bpy.context.scene.cursor_location = Vector((0,0,0))
     bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
-    bpy.ops.transform.rotate(value=Linkage_Incidence-math.radians(90), axis=(1,0,0))
-    bpy.ops.transform.translate(value=(0, Linkage_Offset, 0))
+    bpy.ops.transform.rotate(value=bpy.context.scene.linkage_incidence-math.radians(90), axis=(1,0,0))
+    bpy.ops.transform.translate(value=(0, bpy.context.scene.linkage_offset, 0))
     return linkage
 
 def add_female_linkage():
-    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.0015, depth=Linkage_Female_Len  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=(0, 0, Linkage_Female_Len/2), rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
+    bpy.ops.mesh.primitive_cylinder_add(vertices=12, radius=0.0015, depth=bpy.context.scene.linkage_female_len  , end_fill_type='NGON', calc_uvs=False, view_align=False, enter_editmode=False, location=(0, 0, bpy.context.scene.linkage_female_len/2), rotation=(0.0, 0.0, 0.0), layers=bpy.context.scene.layers)
     linkage = bpy.context.object
     linkage.name = 'female linkage'
     bpy.context.scene.cursor_location = Vector((0,0,0))
     bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
-    bpy.ops.transform.rotate(value= -Linkage_Incidence-math.radians(90), axis=(1,0,0))
-    bpy.ops.transform.translate(value=(0, Linkage_Offset, 0))
+    bpy.ops.transform.rotate(value= -bpy.context.scene.linkage_incidence-math.radians(90), axis=(1,0,0))
+    bpy.ops.transform.translate(value=(0, bpy.context.scene.linkage_offset, 0))
     return linkage
 
 def append_obj(blend_file_name, obj_name):
@@ -191,7 +200,7 @@ def test2():
 def test():
     hub = add_hub()
     spoke_num = 0
-    spoke = add_spoke(hub, spoke_num * 2 * pi / Spoke_Number + Spoke_Start_Angle+pi/2)
+    spoke = add_spoke(hub, spoke_num * 2 * pi / bpy.context.scene.spoke_number + bpy.context.scene.spoke_start_angle+pi/2)
     vane = append_obj('vane2.blend', 'Large Disk')
     vane.scale = vane.scale * 0.5
     rot_perp = Matrix.Rotation(-pi/2, 4, 'Y')
