@@ -1,5 +1,3 @@
-#TODO: Fix this so it reloads script1 when it is reloaded
-
 bl_info = {
     "name": "New Wind Spinner",
     "author": "Mike Gering",
@@ -73,6 +71,8 @@ class WindSpinnerMakerPanel(bpy.types.Panel):
         row.prop(context.scene, 'linkage_offset')
         row = layout.row()
         row.prop_search(context.scene, 'vane_1', context.scene, "objects")
+        row = layout.row()
+        row.prop_search(context.scene, 'vane_2', context.scene, "objects")
 
         TheCol = self.layout.column(align=True)
         TheCol.operator("mesh.add_wind_spinner", text="Add Wind Spinner")
@@ -83,26 +83,6 @@ def add_object(self, context):
     rim = script1.add_rim()
     spinners = script1.add_spinners(rim)
     return
-    scene = context.scene
-    obj_act = scene.objects.active
-
-    scale_x = self.scale.x
-    scale_y = self.scale.y
-
-    verts = [Vector((-1 * scale_x, 1 * scale_y, 0)),
-             Vector((1 * scale_x, 1 * scale_y, 0)),
-             Vector((1 * scale_x, -1 * scale_y, 0)),
-             Vector((-1 * scale_x, -1 * scale_y, 0)),
-            ]
-
-    edges = []
-    faces = [[0, 1, 2, 3]]
-
-    mesh = bpy.data.meshes.new(name="New Wind Spinner")
-    mesh.from_pydata(verts, edges, faces)
-    # useful for development when the mesh may be invalid.
-    mesh.validate(verbose=True)
-    object_data_add(context, mesh, operator=self)
 
 class AddWindSpinner(bpy.types.Operator, AddObjectHelper):
     """Add Wind Spinner"""
@@ -212,30 +192,33 @@ def register():
         description='starting angle for first spoke on spinner')
     bpy.types.Scene.linkage_male_len = FloatProperty(
         name='male linkage length',
-        default=0.12,
+        default=0.10,
         subtype="DISTANCE",
         unit='LENGTH',
         description='length of male linkage')
     bpy.types.Scene.linkage_female_len = FloatProperty(
         name='female linkage length',
-        default=0.12,
+        default=0.10,
         subtype="DISTANCE",
         unit='LENGTH',
         description='length of female linkage')
     bpy.types.Scene.linkage_incidence = FloatProperty(
         name='linkage_incidence',
-        default=math.pi/3,
+        default=math.radians(72),
         subtype="ANGLE",
         unit='ROTATION',
         description='hub incidence angle for linkage')
     bpy.types.Scene.linkage_offset = FloatProperty(
         name='linkage offset',
-        default=0.02,
+        default=0.04,
         subtype="DISTANCE",
         unit='LENGTH',
         description='linkage offset from hub center')
     bpy.types.Scene.vane_1 = StringProperty(
         name='vane 1'
+        )
+    bpy.types.Scene.vane_2 = StringProperty(
+        name='vane 2'
         )
 
 def unregister():

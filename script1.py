@@ -47,7 +47,7 @@ def add_rim():
     rim = bpy.context.object
     rim.name = 'rim'
     bpy.ops.object.editmode_toggle()
-    bpy.ops.transform.shrink_fatten(value=0.007) #TODO: ??? hack since minor radius in torus_add is limited
+    bpy.ops.transform.shrink_fatten(value=bpy.context.scene.rim_minor_radius)
     bpy.ops.object.editmode_toggle()
     return rim
 
@@ -113,12 +113,9 @@ def add_spokes(hub, spinner_type):
             spoke = add_spoke(hub, spoke_num * 2 * pi / bpy.context.scene.spoke_number + bpy.context.scene.spoke_start_angle)
             vane_src = bpy.context.scene.objects[bpy.context.scene.vane_1]
             me = vane_src.data
-            #me_copy = me.copy()
-            #vane = bpy.data.objects.new(bpy.context.scene.vane_1, me_copy)
             vane = bpy.data.objects.new(bpy.context.scene.vane_1, me)
             vane.location = (0,0,0)
             bpy.context.scene.objects.link(vane)
-            #vane = append_obj('vane2.blend', 'Big Vane')
             rot_perp = Matrix.Rotation(-pi/2, 4, 'Y')
             rot_perp2 = Matrix.Rotation(pi/2, 4, 'X')
             trans = Matrix.Translation(Vector((0, 0, bpy.context.scene.spoke_len/2)))
@@ -127,11 +124,14 @@ def add_spokes(hub, spinner_type):
             vane.location = m.to_translation()
             vane.parent = spoke
             spokes.append(spoke)
-    elif spinner_type ==1:
+    elif spinner_type == 1:
         for spoke_num in range(bpy.context.scene.spoke_number):
             spoke = add_spoke(hub, spoke_num * 2 * pi / bpy.context.scene.spoke_number + bpy.context.scene.spoke_start_angle+pi/2)
-            vane = append_obj('vane2.blend', 'Large Disk')
-            vane.scale = vane.scale * 0.5
+            vane_src = bpy.context.scene.objects[bpy.context.scene.vane_2]
+            me = vane_src.data
+            vane = bpy.data.objects.new(bpy.context.scene.vane_2, me)
+            vane.location = (0,0,0)
+            bpy.context.scene.objects.link(vane)
             rot_perp = Matrix.Rotation(-pi/2, 4, 'Y')
             rot_perp2 = Matrix.Rotation(pi/2, 4, 'X')
             trans = Matrix.Translation(Vector((0, 0, -0.03)))
