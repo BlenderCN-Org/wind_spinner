@@ -117,9 +117,13 @@ def add_spokes(hub, spinner_type):
             vane.location = (0,0,0)
             bpy.context.scene.objects.link(vane)
             rot_perp = Matrix.Rotation(-pi/2, 4, 'Y')
-            rot_perp2 = Matrix.Rotation(pi/2, 4, 'X')
+            x = 1
+            if spoke_num % 2:
+                x = -1
+            rot_perp2 = Matrix.Rotation(x * pi/2, 4, 'X')
+            rot3 = Matrix.Rotation(0, 4, 'Z')
             trans = Matrix.Translation(Vector((0, 0, bpy.context.scene.spoke_len/2)))
-            m = trans * rot_perp * rot_perp2
+            m = trans * rot_perp * rot_perp2 * rot3
             vane.rotation_euler = m.to_euler()
             vane.location = m.to_translation()
             vane.parent = spoke
