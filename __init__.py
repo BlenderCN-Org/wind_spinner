@@ -1,6 +1,4 @@
-### NOTES
-# Look at pingpong example for drawing a button on a panel. Use the button execute() to create the spinner.
-# https://wiki.blender.org/index.php/Dev:Py/Scripts/Cookbook/Panels_and_Operators/Ping_Pong
+#TODO: Fix this so it reloads script1 when it is reloaded
 
 bl_info = {
     "name": "New Wind Spinner",
