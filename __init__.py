@@ -12,6 +12,16 @@ bl_info = {
     "category": "Add Mesh",
     }
 
+# To support reload properly, try to access a package var, 
+# if it's there, reload everything
+if "bpy" in locals():
+    import imp
+    imp.reload(script1)
+    #print("Reloaded multifiles")
+else:
+    from . import script1
+    #print("Imported multifiles")
+
 import bpy
 import math
 from bpy.types import Operator
@@ -125,8 +135,9 @@ def add_object_button(self, context):
         icon='PLUGIN')
 
 def register():  
-    bpy.utils.register_class(AddWindSpinner)
-    bpy.utils.register_class(WindSpinnerMakerPanel)
+    bpy.utils.register_module(__name__)
+    #bpy.utils.register_class(AddWindSpinner)
+    #bpy.utils.register_class(WindSpinnerMakerPanel)
     bpy.types.INFO_MT_mesh_add.append(add_object_button)
 
     # Properties
@@ -228,6 +239,7 @@ def register():
         )
 
 def unregister():
+    bpy.utils.unregister_module(__name__)
     bpy.utils.unregister_class(AddWindSpinner)
     bpy.utils.unregister_class(WindSpinnerMakerPanel)
     bpy.types.INFO_MT_mesh_add.remove(add_object_button)
